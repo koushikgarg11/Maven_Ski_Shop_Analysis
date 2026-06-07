@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Maven Ski Shop — Black Friday 2021</title>
+<script src="https://cdn.plot.ly/plotly-3.6.0.min.js" crossorigin="anonymous"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0B1120;
+    --surface: #121B2E;
+    --card: #162138;
+    --border: #1F304D;
+    --accent-blue: #3B82F6;
+    --accent-purple: #8B5CF6;
+    --accent-green: #10B981;
+    --accent-amber: #F59E0B;
+    --accent-red: #EF4444;
+    --text-primary: #E8EEF7;
+    --text-secondary: #7E93B2;
+    --text-dim: #4A6080;
+    --snow: #C8D8ED;
+    --glow-blue: rgba(59,130,246,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Snow particle background */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 40% at 50% -10%, rgba(59,130,246,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 30% at 80% 110%, rgba(139,92,246,0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 24px 24px 48px; }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::after {
+    content: '⛷';
+    font-size: 120px;
+    position: absolute;
+    right: 180px; top: -20px;
+    opacity: 0.05;
+    pointer-events: none;
+  }
+  .header-left h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+  }
+  .header-left h1 span { color: var(--accent-blue); }
+  .header-left p { color: var(--text-secondary); font-size: 0.875rem; margin-top: 4px; }
+  .header-badge {
+    background: linear-gradient(135deg, #1e3a5f, #1a2d50);
+    border: 1px solid #2a4570;
+    border-radius: 10px;
+    padding: 12px 20px;
+    text-align: center;
+  }
+  .header-badge span { display: block; font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; }
+  .header-badge strong { font-size: 1rem; color: var(--snow); font-weight: 600; }
+
+  /* ── FILTER BAR ── */
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .filter-label { font-size: 0.8rem; color: var(--text-dim); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; margin-right: 4px; }
+  .filter-btn {
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+  .filter-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+  .filter-btn.active { background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; }
+  .filter-sep { color: var(--border); margin: 0 4px; }
+
+  /* ── KPI STRIP ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+    cursor: default;
+  }
+  .kpi-card:hover { transform: translateY(-2px); border-color: #2a4570; }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 14px 14px 0 0;
+  }
+  .kpi-card.blue::before { background: var(--accent-blue); }
+  .kpi-card.purple::before { background: var(--accent-purple); }
+  .kpi-card.green::before { background: var(--accent-green); }
+  .kpi-card.amber::before { background: var(--accent-amber); }
+  .kpi-card.red::before { background: var(--accent-red); }
+  .kpi-icon { font-size: 1.4rem; margin-bottom: 10px; }
+  .kpi-value { font-size: 1.65rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; line-height: 1; }
+  .kpi-label { font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 500; }
+
+  /* ── CHART GRID ── */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .chart-grid.three-col { grid-template-columns: 1fr 1fr 1fr; }
+  .chart-grid.wide { grid-template-columns: 2fr 1fr; }
+
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 20px 16px;
+    position: relative;
+  }
+  .chart-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .chart-title .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .chart-title .dot.blue { background: var(--accent-blue); }
+  .chart-title .dot.purple { background: var(--accent-purple); }
+  .chart-title .dot.green { background: var(--accent-green); }
+  .chart-title .dot.amber { background: var(--accent-amber); }
+  .chart-title .dot.mixed {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  }
+
+  .plot-container { width: 100%; }
+
+  /* ── INVENTORY LEGEND ── */
+  .inv-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .inv-legend span {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .inv-legend span::before {
+    content: '■';
+    font-size: 10px;
+  }
+  .inv-legend .red::before { color: var(--accent-red); }
+  .inv-legend .amber::before { color: var(--accent-amber); }
+  .inv-legend .green::before { color: var(--accent-green); }
+
+  /* ── TOOLTIP STYLE ── */
+  .js-plotly-plot .plotly .hoverlayer { pointer-events: none; }
+
+  @media (max-width: 900px) {
+    .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    .chart-grid { grid-template-columns: 1fr; }
+    .chart-grid.wide { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-left">
+      <h1>Maven <span>Ski Shop</span></h1>
+      <p>Black Friday Sales Dashboard &nbsp;·&nbsp; Nov 26–28, 2021</p>
+    </div>
+    <div style="display:flex;gap:12px;">
+      <div class="header-badge">
+        <span>Peak Day</span>
+        <strong>Nov 26</strong>
+      </div>
+      <div class="header-badge">
+        <span>Locations</span>
+        <strong>3 Resorts</strong>
+      </div>
+      <div class="header-badge">
+        <span>Products</span>
+        <strong>14 SKUs</strong>
+      </div>
+    </div>
+  </header>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <span class="filter-label">Location</span>
+    <button class="filter-btn active" onclick="filterLocation('all',this)">All</button>
+    <button class="filter-btn" onclick="filterLocation('Mammoth',this)">🏔 Mammoth</button>
+    <button class="filter-btn" onclick="filterLocation('Stowe',this)">⛄ Stowe</button>
+    <button class="filter-btn" onclick="filterLocation('Sun Valley',this)">☀️ Sun Valley</button>
+    <span class="filter-sep">|</span>
+    <span class="filter-label">Day</span>
+    <button class="filter-btn active" onclick="filterDay('all',this)">All Days</button>
+    <button class="filter-btn" onclick="filterDay('Nov 26',this)">Nov 26</button>
+    <button class="filter-btn" onclick="filterDay('Nov 27',this)">Nov 27</button>
+    <button class="filter-btn" onclick="filterDay('Nov 28',this)">Nov 28</button>
+  </div>
+
+  <!-- KPI ROW -->
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-value" id="kpi-revenue">$8,731.47</div>
+      <div class="kpi-label">Total Revenue</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-icon">📦</div>
+      <div class="kpi-value" id="kpi-orders">27</div>
+      <div class="kpi-label">Total Orders</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-icon">🛒</div>
+      <div class="kpi-value" id="kpi-aov">$323.39</div>
+      <div class="kpi-label">Avg Order Value</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-icon">🎿</div>
+      <div class="kpi-value" id="kpi-items">54</div>
+      <div class="kpi-label">Items Sold</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-icon">⛔</div>
+      <div class="kpi-value" id="kpi-oos">3</div>
+      <div class="kpi-label">Out of Stock</div>
+    </div>
+  </div>
+
+  <!-- ROW 1: Daily Revenue + Location Revenue -->
+  <div class="chart-grid" style="margin-bottom:16px;">
+    <div class="chart-card">
+      <div class="chart-title"><span class="dot blue"></span>Daily Revenue</div>
+      <div id="chart-daily" class="plot-container"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title"><span class="dot mixed"></span>Revenue by Location</div>
+      <div id="chart-location-rev" class="plot-container"></div>
+    </div>
+  </div>
+
+  <!-- ROW 2: Orders by Day & Location + Units Sold -->
+  <div class="chart-grid" style="margin-bottom:16px;">
+    <div class="chart-card">
+      <div class="chart-title"><span class="dot purple"></span>Orders per Day by Location</div>
+      <div id="chart-orders-loc" class="plot-container"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title"><span class="dot green"></span>Units Sold by Product</div>
+      <div id="chart-units" class="plot-container"></div>
+    </div>
+  </div>
+
+  <!-- ROW 3: Top Products by Revenue + Inventory Status -->
+  <div class="chart-grid" style="margin-bottom:0;">
+    <div class="chart-card">
+      <div class="chart-title"><span class="dot amber"></span>Top Products by Revenue</div>
+      <div id="chart-prod-rev" class="plot-container"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title"><span class="dot red"></span>Inventory Status</div>
+      <div id="chart-inventory" class="plot-container"></div>
+      <div class="inv-legend">
+        <span class="red">Out of Stock</span>
+        <span class="amber">Low (≤5)</span>
+        <span class="green">OK</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── RAW DATA ───────────────────────────────────────────────────────
+const RAW = {
+  daily: {
+    days: ['Nov 26','Nov 27','Nov 28'],
+    all:       {Mammoth:[6,1,2], Stowe:[3,3,3], 'Sun Valley':[6,3,0]},
+    rev:       {Mammoth:[3879.81*6/9, 3879.81*1/9, 3879.81*2/9],
+                Stowe:  [3582.82/3, 3582.82/3, 3582.82/3],
+                'Sun Valley':[1268.84*6/9, 1268.84*3/9, 0]},
+    totalRev:  [5515.65, 1600.92, 1614.90],
+  },
+  locationRev: {
+    locs:   ['Sun Valley','Stowe','Mammoth'],
+    vals:   [1268.84, 3582.82, 3879.81],
+    colors: ['#3B82F6','#8B5CF6','#10B981'],
+  },
+  products: {
+    names:  ['Snowboard Boots','Unknown Item (#10014)','Coat','Bindings','Snowboard','Snow Pants','Gloves','Coffee','Sweatshirt','Helmet','Beanie','Ski Poles','Skis','Ski Boots'],
+    units:  [1,2,2,3,3,3,4,4,4,5,5,6,6,6],
+  },
+  prodRev: {
+    names:  ['Snow Pants','Coat','Bindings','Helmet','Ski Poles','Ski Boots','Snowboard','Skis'],
+    vals:   [240,240,450,500,600,1200,1500,3600],
+  },
+  inventory: {
+    names:  ['Coat','Ski Poles','Snowboard Boots','Ski Boots','Bindings','Skis','Snow Pants','Helmet','Gloves','Beanie','Sweatshirt','Coffee'],
+    stock:  [0,0,0,1,4,5,6,8,10,15,20,25,25,100],
+    stockFull: [0,0,0,1,4,5,6,8,10,15,20,25],
+    colors: ['#EF4444','#EF4444','#EF4444','#F59E0B','#F59E0B','#F59E0B','#10B981','#10B981','#10B981','#10B981','#10B981','#10B981'],
+  },
+};
+
+// Per-location revenue totals
+const LOC_TOTALS = {'Mammoth': 3879.81, 'Stowe': 3582.82, 'Sun Valley': 1268.84};
+const LOC_ORDERS = {'Mammoth': 9, 'Stowe': 9, 'Sun Valley': 9};
+
+// ─── STATE ─────────────────────────────────────────────────────────
+let activeLocation = 'all';
+let activeDay = 'all';
+
+// ─── PLOT CONFIG ────────────────────────────────────────────────────
+const DARK_LAYOUT = {
+  paper_bgcolor: 'rgba(0,0,0,0)',
+  plot_bgcolor:  'rgba(0,0,0,0)',
+  font: { family:"'DM Sans', sans-serif", color:'#7E93B2', size: 11 },
+  margin: { t:10, b:40, l:10, r:20, pad:0 },
+  xaxis: { gridcolor:'#1F304D', linecolor:'#1F304D', tickcolor:'#4A6080', zerolinecolor:'#1F304D' },
+  yaxis: { gridcolor:'#1F304D', linecolor:'rgba(0,0,0,0)', tickcolor:'#4A6080', zerolinecolor:'rgba(0,0,0,0)' },
+  showlegend: false,
+  hoverlabel: { bgcolor:'#1A2A42', bordercolor:'#2A4570', font:{color:'#E8EEF7', family:"'DM Sans', sans-serif"} },
+};
+const CONFIG = { responsive: true, displayModeBar: false };
+
+// ─── BUILD CHARTS ────────────────────────────────────────────────────
+
+function buildDailyRevenue() {
+  // Use per-location per-day revenue from RAW.daily.rev
+  const allDays = RAW.daily.days;
+  const days = activeDay === 'all' ? allDays : [activeDay];
+  const dayIndices = activeDay === 'all' ? [0,1,2] : [allDays.indexOf(activeDay)];
+
+  let revData;
+  if (activeLocation === 'all') {
+    revData = dayIndices.map(i => RAW.daily.totalRev[i]);
+  } else {
+    revData = dayIndices.map(i => RAW.daily.rev[activeLocation][i]);
+  }
+
+  const barColors = ['#3B82F6','#60A5FA','#93C5FD'];
+  const colors = dayIndices.map(i => barColors[i]);
+
+  const trace = {
+    x: days,
+    y: revData,
+    type: 'bar',
+    marker: { color: colors, line:{width:0} },
+    text: revData.map(v => `$${Math.round(v).toLocaleString('en-US')}`),
+    textposition: 'outside',
+    textfont: { color: '#E8EEF7', size: 12, family:"'DM Sans',sans-serif" },
+    hovertemplate: '<b>%{x}</b><br>Revenue: $%{y:,.2f}<extra></extra>',
+  };
+
+  Plotly.newPlot('chart-daily', [trace], {
+    ...DARK_LAYOUT,
+    margin: { t:20, b:40, l:60, r:40 },
+    xaxis: { ...DARK_LAYOUT.xaxis, type:'category' },
+    yaxis: { ...DARK_LAYOUT.yaxis, tickprefix:'$', tickformat:',.0f' },
+    height: 240,
+    bargap: 0.35,
+  }, CONFIG);
+}
+
+function buildLocationRev() {
+  let locs = [...RAW.locationRev.locs];
+  let vals = [...RAW.locationRev.vals];
+  let colors = [...RAW.locationRev.colors];
+
+  if (activeLocation !== 'all') {
+    const idx = locs.indexOf(activeLocation);
+    locs = [locs[idx]]; vals = [vals[idx]]; colors = [colors[idx]];
+  }
+
+  // Scale by day filter
+  const dayFactor = activeDay === 'all' ? 1 : 1/3;
+
+  const trace = {
+    labels: locs,
+    values: vals.map(v => v * dayFactor),
+    type: 'pie',
+    marker: { colors, line:{ color:'#0B1120', width:3 } },
+    textfont: { color:'#E8EEF7', size:12 },
+    textinfo: 'label+percent',
+    hovertemplate: '<b>%{label}</b><br>Revenue: $%{value:,.2f}<extra></extra>',
+    pull: locs.map((_,i) => i===0 ? 0.04 : 0),
+  };
+
+  Plotly.newPlot('chart-location-rev', [trace], {
+    ...DARK_LAYOUT,
+    height: 240,
+    margin: { t:10, b:10, l:10, r:10 },
+    showlegend: true,
+    legend: { orientation:'h', y:-0.1, font:{color:'#7E93B2', size:11} },
+  }, CONFIG);
+}
+
+function buildOrdersLoc() {
+  const days = activeDay === 'all' ? RAW.daily.days : [activeDay];
+  const dayIdx = activeDay === 'all' ? [0,1,2] : [RAW.daily.days.indexOf(activeDay)];
+  const locs = activeLocation === 'all' ? ['Mammoth','Stowe','Sun Valley'] : [activeLocation];
+  const locColors = { Mammoth:'#10B981', Stowe:'#8B5CF6', 'Sun Valley':'#3B82F6' };
+
+  const traces = locs.map(loc => ({
+    name: loc,
+    x: days,
+    y: dayIdx.map(i => RAW.daily.all[loc][i]),
+    type: 'bar',
+    marker: { color: locColors[loc], line:{width:0} },
+    hovertemplate: `<b>${loc}</b><br>%{x}: %{y} orders<extra></extra>`,
+  }));
+
+  Plotly.newPlot('chart-orders-loc', traces, {
+    ...DARK_LAYOUT,
+    height: 240,
+    barmode: 'group',
+    bargap: 0.2,
+    bargroupgap: 0.05,
+    showlegend: true,
+    legend: { orientation:'h', y:-0.25, font:{color:'#7E93B2', size:11} },
+    margin: { t:10, b:60, l:30, r:20 },
+    xaxis: { ...DARK_LAYOUT.xaxis, type:'category' },
+  }, CONFIG);
+}
+
+function buildUnits() {
+  const trace = {
+    y: RAW.products.names,
+    x: RAW.products.units,
+    type: 'bar',
+    orientation: 'h',
+    marker: { color: '#10B981', line:{width:0} },
+    text: RAW.products.units,
+    textposition: 'outside',
+    textfont: { color:'#E8EEF7', size:11 },
+    hovertemplate: '<b>%{y}</b><br>Units: %{x}<extra></extra>',
+  };
+
+  Plotly.newPlot('chart-units', [trace], {
+    ...DARK_LAYOUT,
+    height: 340,
+    margin: { t:10, b:30, l:145, r:40 },
+    xaxis: { ...DARK_LAYOUT.xaxis, dtick:1 },
+    yaxis: { ...DARK_LAYOUT.yaxis, automargin:true },
+  }, CONFIG);
+}
+
+function buildProdRev() {
+  const vals = [...RAW.prodRev.vals];
+  const maxVal = Math.max(...vals);
+
+  const trace = {
+    y: RAW.prodRev.names,
+    x: vals,
+    type: 'bar',
+    orientation: 'h',
+    marker: {
+      color: vals.map(v => `rgba(139,92,246,${0.35 + 0.65 * v/maxVal})`),
+      line: { color:'#5B21B6', width:0.5 },
+    },
+    text: vals.map(v => `$${v.toLocaleString()}`),
+    textposition: 'outside',
+    textfont: { color:'#E8EEF7', size:11 },
+    hovertemplate: '<b>%{y}</b><br>Revenue: $%{x:,.2f}<extra></extra>',
+  };
+
+  Plotly.newPlot('chart-prod-rev', [trace], {
+    ...DARK_LAYOUT,
+    height: 280,
+    margin: { t:10, b:30, l:100, r:60 },
+    xaxis: { ...DARK_LAYOUT.xaxis, tickprefix:'$', tickformat:',.0f' },
+    yaxis: { ...DARK_LAYOUT.yaxis, automargin:true },
+  }, CONFIG);
+}
+
+function buildInventory() {
+  const trace = {
+    y: RAW.inventory.names,
+    x: RAW.inventory.stockFull,
+    type: 'bar',
+    orientation: 'h',
+    marker: { color: RAW.inventory.colors, line:{color:'#0B1120', width:0.5} },
+    text: RAW.inventory.stockFull.map(v => v===0 ? '⛔ 0' : v),
+    textposition: 'outside',
+    textfont: { color:'#E8EEF7', size:11 },
+    hovertemplate: '<b>%{y}</b><br>In stock: %{x}<extra></extra>',
+  };
+
+  Plotly.newPlot('chart-inventory', [trace], {
+    ...DARK_LAYOUT,
+    height: 280,
+    margin: { t:10, b:30, l:130, r:40 },
+    yaxis: { ...DARK_LAYOUT.yaxis, automargin:true },
+  }, CONFIG);
+}
+
+// ─── KPI UPDATE ────────────────────────────────────────────────────
+function updateKPIs() {
+  const dayFactors = {'all':1, 'Nov 26': 5515.65/8731.47, 'Nov 27': 1600.92/8731.47, 'Nov 28': 1614.90/8731.47};
+  const totalRevAll = 8731.47; // sum of location subtotals (1268.84+3582.82+3879.81)
+  const df = dayFactors[activeDay];
+
+  let rev, orders, items;
+  if (activeLocation === 'all') {
+    rev = totalRevAll * df;
+    orders = 27 * df;
+    items = 54 * df;
+  } else {
+    rev = LOC_TOTALS[activeLocation] * df;
+    orders = LOC_ORDERS[activeLocation] * df;
+    items = Math.round(54 * (LOC_TOTALS[activeLocation] / totalRevAll) * df);
+  }
+
+  document.getElementById('kpi-revenue').textContent = '$' + rev.toLocaleString('en-US',{maximumFractionDigits:2,minimumFractionDigits:2});
+  document.getElementById('kpi-orders').textContent = Math.round(orders);
+  document.getElementById('kpi-aov').textContent = orders > 0 ? '$' + (rev/Math.round(orders)).toLocaleString('en-US',{maximumFractionDigits:2,minimumFractionDigits:2}) : '-';
+  document.getElementById('kpi-items').textContent = Math.round(items);
+}
+
+// ─── FILTERS ────────────────────────────────────────────────────────
+function filterLocation(loc, el) {
+  activeLocation = loc;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    if (['all','Mammoth','Stowe','Sun Valley'].includes(b.textContent.replace(/[^a-zA-Z ]/g,'').trim()) ||
+        b.onclick?.toString().includes('filterLocation')) {
+      b.classList.remove('active');
+    }
+  });
+  el.classList.add('active');
+  renderAll();
+}
+
+function filterDay(day, el) {
+  activeDay = day;
+  // Only toggle day buttons
+  const dayBtns = [...document.querySelectorAll('.filter-btn')].filter(b => 
+    b.onclick?.toString().includes('filterDay'));
+  dayBtns.forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderAll();
+}
+
+function renderAll() {
+  updateKPIs();
+  buildDailyRevenue();
+  buildLocationRev();
+  buildOrdersLoc();
+}
+
+// Static charts (not filter-dependent)
+buildUnits();
+buildProdRev();
+buildInventory();
+renderAll();
+</script>
+</body>
+</html>
